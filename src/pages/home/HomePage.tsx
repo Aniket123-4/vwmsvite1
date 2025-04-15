@@ -1360,6 +1360,8 @@ th, td {
   const adjustedColumns3 = columns3.map((column: any) => ({
     ...column,
   }));
+
+  
   return (
     <div>
       <Box sx={{ marginTop: "1%" }}>

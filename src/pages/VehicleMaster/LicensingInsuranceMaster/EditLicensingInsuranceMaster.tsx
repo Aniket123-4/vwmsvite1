@@ -116,7 +116,7 @@ const EditLicensingInsuranceMaster = (props: Props) => {
     const response = await api.post(`Master/GetVendorMaster`, collectData);
     const data = response.data.data;
     //console.log("Vendor data==>  ",data);
-    const arr = [];
+    const arr:any = [];
     for (let index = 0; index < data.length; index++) {
       arr.push({
         label: data[index]["name"],
@@ -484,17 +484,20 @@ const EditLicensingInsuranceMaster = (props: Props) => {
 
               {/* narration */}
               <Grid item xs={12} sm={4} lg={4}>
-                <TranslateTextField
+
+                
+              <TextField
                   label={t("text.Narration")}
                   value={formik.values.narration}
-                  onChangeText={(text: string) => formik.setFieldValue("narration", text)}
-                  required={false}
-                  lang={lang}
+                  onChange={(event) => formik.setFieldValue("narration", event.target.value)}
+                  fullWidth
+                  variant="outlined"
+
+                  size="small"
+
+                  InputLabelProps={{ shrink: true }}
                 />
-
               </Grid>
-
-
               {/* amount */}
               <Grid item xs={12} sm={4} lg={4}>
                 <TextField

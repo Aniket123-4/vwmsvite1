@@ -118,7 +118,7 @@ const EditUtilizationLog = (props: Props) => {
     };
     const response = await api.post(`Employee/GetEmployee`, collectData);
     const data = response.data.data;
-    const arr = [];
+    const arr:any = [];
     for (let index = 0; index < data.length; index++) {
       arr.push({
         label: data[index]["empName"],
@@ -455,110 +455,25 @@ const EditUtilizationLog = (props: Props) => {
 
               {/* remark */}
               <Grid item xs={12} sm={4} lg={4}>
-                <TranslateTextField
+                <TextField
                   label={t("text.Remark")}
                   value={formik.values.remark}
-                  onChangeText={(text: string) => formik.setFieldValue("remark", text)}
-                  required={true}
-                  lang={lang}
+                  onChange={(event) => formik.setFieldValue("remark", event.target.value)}
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
                 />
+
+                
+
               </Grid>
 
 
               <Grid item lg={8} sm={8} xs={12}></Grid>
 
 
-              {/* attachment */}
-              {/* <Grid container spacing={1} item>
-                <Grid
-                  xs={12}
-                  md={4}
-                  sm={4}
-                  item
-                  style={{ marginBottom: "30px", marginTop: "30px" }}
-                >
-                  <TextField
-                    type="file"
-                    inputProps={{ accept: "image/*" }}
-                    InputLabelProps={{ shrink: true }}
-                    label={<CustomLabel text={t("text.AttachedImage")} />}
-                    size="small"
-                    fullWidth
-                    style={{ backgroundColor: "white" }}
-                    onChange={(e) => otherDocChangeHandler(e, "imageFile")}
-                  />
-                </Grid>
-                <Grid xs={12} md={4} sm={4} item></Grid>
-
-                <Grid xs={12} md={4} sm={4} item>
-                  <Grid
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      margin: "10px",
-                    }}
-                  >
-                    {formik.values.imageFile == "" ? (
-                      <img
-                        src={nopdf}
-                        style={{
-                          width: 150,
-                          height: 100,
-                          border: "1px solid grey",
-                          borderRadius: 10,
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src={`data:image/jpg;base64,${formik.values.imageFile}`}
-                        style={{
-                          width: 150,
-                          height: 100,
-                          border: "1px solid grey",
-                          borderRadius: 10,
-                          padding: "2px",
-                        }}
-                      />
-                    )}
-                    <Typography
-                      onClick={() => modalOpenHandle1("imageFile")}
-                      style={{
-                        textDecorationColor: "blue",
-                        textDecorationLine: "underline",
-                        color: "blue",
-                        fontSize: "15px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("text.Preview")}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Modal open={panOpens} onClose={handlePanClose1}>
-                  <Box sx={style}>
-                    {modalImg == "" ? (
-                      <img
-                        src={nopdf}
-                        style={{
-                          width: "170vh",
-                          height: "75vh",
-                        }}
-                      />
-                    ) : (
-                      <img
-                        alt="preview image"
-                        src={modalImg}
-                        style={{
-                          width: "170vh",
-                          height: "75vh",
-                          borderRadius: 10,
-                        }}
-                      />
-                    )}
-                  </Box>
-                </Modal>
-              </Grid> */}
+           
 
 
               {/* Submit Button */}

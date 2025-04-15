@@ -101,10 +101,105 @@ import DescriptionIcon from "@mui/icons-material/Description";
 
 import { FaFileLines } from "react-icons/fa6";
 
-const drawerWidth = 225;
+// Constants
+const DRAWER_WIDTH = 225;
+const GREETING_CONFIGS = [
+  {
+    maxHour: 12,
+    text: "Good Morning",
+    color: "#FFFFE0",
+    icon: "🌅"
+  },
+  {
+    maxHour: 17,
+    text: "Good Afternoon",
+    color: "#FFE4B5",
+    icon: "🌞"
+  },
+  {
+    maxHour: 24,
+    text: "Good Evening",
+    color: "#FFDAB9",
+    icon: "🌜"
+  }
+];
 
-const style = {
-  position: "absolute" as "absolute",
+// Reusable transition creator
+const createTransition = (
+  theme: Theme,
+  props: string | string[],
+  duration: 'leavingScreen' | 'enteringScreen'
+) => theme.transitions.create(props, {
+  easing: theme.transitions.easing.sharp,
+  duration: theme.transitions.duration[duration]
+});
+
+// Common styles
+const baseMixin = (theme: Theme): CSSObject => ({
+  overflowX: "hidden",
+  width: DRAWER_WIDTH
+});
+
+const openedMixin = (theme: Theme): CSSObject => ({
+  ...baseMixin(theme),
+  transition: createTransition(theme, "width", "enteringScreen")
+});
+
+const closedMixin = (theme: Theme): CSSObject => ({
+  transition: createTransition(theme, "width", "leavingScreen"),
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: `calc(${theme.spacing(12)} + 1px)`
+  }
+});
+
+// Styled components
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar
+}));
+
+interface AppBarProps extends MuiAppBarProps { open?: boolean }
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open"
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: createTransition(theme, ["width", "margin"], "leavingScreen"),
+  ...(open && {
+    marginLeft: DRAWER_WIDTH,
+    width: `calc(100% - ${DRAWER_WIDTH}px)`,
+    transition: createTransition(theme, ["width", "margin"], "enteringScreen")
+  })
+}));
+
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open"
+})(({ theme, open }) => ({
+  width: DRAWER_WIDTH,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open ? {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme)
+  } : {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme)
+  })
+}));
+
+// Helper functions
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  return GREETING_CONFIGS.find(config => hour < config.maxHour) || GREETING_CONFIGS[2];
+};
+
+const modalStyle = {
+  position: "absolute" as const,
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -114,103 +209,8 @@ const style = {
   border: "1px solid #000",
   boxShadow: 24,
   p: 4,
-  borderRadius: 10,
+  borderRadius: 10
 };
-
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: "hidden",
-});
-
-const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(12)} + 1px)`,
-  },
-});
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
-
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
-  ...(open && {
-    ...openedMixin(theme),
-    "& .MuiDrawer-paper": openedMixin(theme),
-  }),
-  ...(!open && {
-    ...closedMixin(theme),
-    "& .MuiDrawer-paper": closedMixin(theme),
-  }),
-}));
-
-function getGreeting() {
-  const hour = new Date().getHours();
-
-  let greeting;
-  if (hour < 12) {
-    greeting = {
-      text: "Good Morning",
-      color: "#FFFFE0",
-      icon: "🌅", // Sunrise emoji
-    };
-  } else if (hour < 17) {
-    greeting = {
-      text: "Good Afternoon",
-      color: "#FFE4B5",
-      icon: "🌞", // Sun emoji
-    };
-  } else {
-    greeting = {
-      text: "Good Evening",
-      color: "#FFDAB9",
-      icon: "🌜", // Crescent moon emoji
-    };
-  }
-
-  return greeting;
-}
 
 export default function MiniDrawer({ items }: any) {
   const theme = useTheme();
@@ -225,18 +225,12 @@ export default function MiniDrawer({ items }: any) {
   const { t } = useTranslation();
   const [menuData, setMenuData] = React.useState([]);
   const [selectedSubMenu, setSelectedSubMenu] = React.useState(null);
-
   const [openMenus, setOpenMenus] = React.useState<Set<number>>(new Set());
-
   const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-
   const [treedata, setTreedata] = React.useState<any>([]);
-  // console.log("data", treedata)
   const [check, setCheck] = React.useState<any>([]);
-
   const [searchValue, setSearchValue] = React.useState("");
-  // const [filteredItems, setFilteredItems] = React.useState([]);
   const [filteredItems, setFilteredItems] = React.useState<MenuItem[]>([]);
 
   const themes = [
@@ -249,80 +243,20 @@ export default function MiniDrawer({ items }: any) {
   ];
 
   const greeting = getGreeting();
-
   const navigate = useNavigate();
+  React.useEffect(() => { setMenuData(items); }, []);
+  const handleMenuClick = (menu: any) => { setActiveMenu(menu.menuId); menu.children?.length ? toggleMenu(menu.menuId, menu.parentId) : menu.path && navigate(menu.path); };
 
+  const toggleMenu = (menuId: number, parentId: number | null) => setOpenMenus((prev: Set<number>) => { const next = new Set(prev); next.has(menuId) ? next.delete(menuId) : (parentId === null && next.clear(), next.add(menuId)); return next; });
 
-  React.useEffect(() => {
-    //const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-    setMenuData(items);
+  const parentMenuOrder = ["Vehicle Management", "Store Management", "Communication", "Vendor Info", "Employee Info", "Reports", "Admin"];
 
-  }, []);
+  const storeManagementChildOrder = ["Item Detail", "Indent For Staff", "WorkShop Indent", "Item Issue", "Item Return", "PurchaseOrder", "Material Receipt Note", "Quality Check", "Store Master", "Stock Opening", "Off.Purchase Indent", "PurchaseInvoice"];
 
-
-  const handleMenuClick = (menu: any) => {
-    setActiveMenu(menu.menuId); // Highlight active menu
-
-    if (menu.children && menu.children.length > 0) {
-      toggleMenu(menu.menuId, menu.parentId); // Toggle submenu
-    } else if (menu.path) {
-      navigate(menu.path); // Navigate only if no children exist
-    }
-  };
-
-
-  const toggleMenu = (menuId: number, parentId: number | null) => {
-    setOpenMenus((prev: Set<number>) => {
-      const newOpenMenus = new Set(prev);
-
-      if (newOpenMenus.has(menuId)) {
-        // If the clicked menu is already open, close it
-        newOpenMenus.delete(menuId);
-      } else {
-        // Close other parent menus if this is a top-level menu (parentId === null)
-        if (parentId === null) {
-          newOpenMenus.clear(); // Collapse all parent menus
-        }
-
-        newOpenMenus.add(menuId); // Open the clicked menu
-      }
-
-      return newOpenMenus;
-    });
-  };
-
-  const parentMenuOrder = [
-    "Vehicle Management",
-    "Store Management",
-    "Communication",
-    "Vendor Info",
-    "Employee Info",
-    "Reports",
-    "Admin",
-  ];
-
-  // Predefined child order for "Store Management"
-  const storeManagementChildOrder = [
-    "Item Detail",
-    "Indent For Staff",
-    "WorkShop Indent",
-    "Item Issue",
-    "Item Return",
-    "PurchaseOrder",
-    "Material Receipt Note",
-    "Quality Check",
-    "Store Master",
-    "Stock Opening",
-    "Off.Purchase Indent",
-    "PurchaseInvoice",
-  ];
-
-  // Function to sort parent menus based on predefined order
   const sortParentMenus = (menus: any[]) => {
     const orderMap = new Map(
       parentMenuOrder.map((name, index) => [name, index])
     );
-
     return menus.slice().sort((a, b) => {
       const indexA: any = orderMap.has(a.menuName)
         ? orderMap.get(a.menuName)
@@ -333,160 +267,108 @@ export default function MiniDrawer({ items }: any) {
       return indexA - indexB;
     });
   };
-
   // Function to sort child menus
-  const sortChildMenus = (parentMenuName: string, menus: any[]) => {
-    if (parentMenuName === "Store Management") {
-      const orderMap = new Map(
-        storeManagementChildOrder.map((name, index) => [name, index])
-      );
-
-      return menus.slice().sort((a, b) => {
-        const indexA: any = orderMap.has(a.menuName)
-          ? orderMap.get(a.menuName)
-          : Infinity;
-        const indexB: any = orderMap.has(b.menuName)
-          ? orderMap.get(b.menuName)
-          : Infinity;
+  const sortChildMenus = (parentMenuName: string, menus: any[]) =>
+    parentMenuName === "Store Management"
+      ? menus.slice().sort((a, b) => {
+        const orderMap = new Map(storeManagementChildOrder?.map((name, index) => [name, index]));
+        const indexA = orderMap?.get(a.menuName) ?? Infinity;
+        const indexB = orderMap?.get(b.menuName) ?? Infinity;
         return indexA - indexB;
-      });
-    }
-    return menus.slice().sort((a, b) => a.menuId - b.menuId); // Default sorting by menuId
-  };
+      })
+      : menus.slice().sort((a, b) => a.menuId - b.menuId);
 
+      // const renderMenu = (menus: any[], level = 0, parentMenuName = "") => {
+      //   const sortedMenus = level === 0 ? sortParentMenus(menus) : sortChildMenus(parentMenuName, menus);
+      //   return sortedMenus.map((menu: any) => (
+      //     <React.Fragment key={menu.menuId}>
+      //       <ListItem
+      //         component="button"
+      //         sx={{
+      //           display: "flex", justifyContent: "space-between", alignItems: "center",
+      //           backgroundColor: activeMenu === menu.menuId ? "#dfe6f5" : "inherit",
+      //           paddingLeft: `${level * 14}px`, paddingY: 0.5, cursor: "pointer",
+      //           "&:hover": { backgroundColor: "#e0ecff" },
+      //           borderRadius: "4px", boxShadow: "none", border: "none", marginY: 0.3
+      //         }}
+      //         onClick={() => handleMenuClick(menu)}
+      //       >
+      //         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+      //           <ListItemIcon
+      //             sx={{ minWidth: "32px", justifyContent: "center", color: activeMenu === menu.menuId ? "#FF0000" : "#333", fontWeight: 600 }}
+      //             onClick={(e) => { e.stopPropagation(); toggleMenu(menu.menuId, menu.parentId); }}
+      //           >
+      //             {menu.children?.length > 0
+      //               ? (openMenus.has(menu.menuId)
+      //                   ? <FaRegFolderOpen style={{ color: "#42AEEE", fontSize: "18px" }} />
+      //                   : <FolderIcon style={{ color: "#42AEEE", fontSize: "18px" }} />)
+      //               : <DescriptionIcon style={{ color: "#42AEEE", fontSize: "18px" }} />}
+      //           </ListItemIcon>
+      //           <Tooltip title={menu.menuName} arrow>
+      //             <ListItemText
+      //               primary={open ? menu.menuName : menu.menuName.charAt(0).toUpperCase()}
+      //               sx={{
+      //                 fontWeight: "bold", fontSize: "13px",
+      //                 color: activeMenu === menu.menuId ? "#0056b3" : "var(--grid-menuColor)",
+      //                 overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis"
+      //               }}
+      //             />
+      //           </Tooltip>
+      //         </Box>
+      //         {menu.children?.length > 0 && (
+      //           <ListItemIcon
+      //             sx={{ paddingRight: "12px", minWidth: "32px", justifyContent: "flex-end", cursor: "pointer", color: "#42AEEE" }}
+      //             onClick={(e) => { e.stopPropagation(); toggleMenu(menu.menuId, menu.parentId); }}
+      //           >
+      //             {openMenus.has(menu.menuId) ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+      //           </ListItemIcon>
+      //         )}
+      //       </ListItem>
+      //       {openMenus.has(menu.menuId) && menu.children?.length > 0 && (
+      //         <Box sx={{ paddingLeft: 2 }}>{renderMenu(menu.children, level + 1, menu.menuName)}</Box>
+      //       )}
+      //     </React.Fragment>
+      //   ));
+      // };
+      
   const renderMenu = (menus: any[], level = 0, parentMenuName = "") => {
-    // Sort parent menus at level 0, otherwise sort by menuId or predefined order
-    //console.log("menus",menus)
-    const sortedMenus =
-      level === 0
-        ? sortParentMenus(menus)
-        : sortChildMenus(parentMenuName, menus);
-
+    const sortedMenus = level === 0 ? sortParentMenus(menus) : sortChildMenus(parentMenuName, menus);
     return sortedMenus.map((menu: any) => (
       <List key={menu.menuId} sx={{ paddingY: 0.5, paddingX: 0 }}>
         <Divider />
-
-        <ListItem
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            backgroundColor: activeMenu === menu.menuId ? "#dfe6f5" : "inherit",
-            paddingLeft: `${level * 14}px`,
-            paddingY: 0.3,
-            cursor: "pointer",
-            "&:hover": { backgroundColor: "#ccccff" },
-            borderRadius: "6px",
-            transition: "background 0.2s ease-in-out",
-          }}
-          onClick={() => handleMenuClick(menu)}
-        >
+        <ListItem component="button" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: activeMenu === menu.menuId ? "#dfe6f5" : "inherit", paddingLeft: `${level * 14}px`, paddingY: 0.3, cursor: "pointer", "&:hover": { backgroundColor: "#ccccff" }, borderRadius: "6px", borderColor:"white", transition: "background 0.2s ease-in-out" }} onClick={() => handleMenuClick(menu)}>
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <ListItemIcon
-              sx={{
-                minWidth: "32px",
-                justifyContent: "center",
-                color: activeMenu === menu.menuId ? "#FF0000" : "#333",
-                fontWeight: 600,
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleMenu(menu.menuId, menu.parentId);
-              }}
-            >
+            <ListItemIcon sx={{ minWidth: "32px", justifyContent: "center", color: activeMenu === menu.menuId ? "#FF0000" : "#333", fontWeight: 600 }} onClick={(e) => { e.stopPropagation(); toggleMenu(menu.menuId, menu.parentId); }}>
               {menu.children && menu.children.length > 0 ? (
-                openMenus.has(menu.menuId) ? (
-                  <FaRegFolderOpen
-                    style={{ color: "#42AEEE", fontSize: "18px" }}
-                  />
-                ) : (
-                  <FolderIcon style={{ color: "#42AEEE", fontSize: "18px" }} />
-                )
+                openMenus.has(menu.menuId) ? <FaRegFolderOpen style={{ color: "#42AEEE", fontSize: "18px" }} /> : <FolderIcon style={{ color: "#42AEEE", fontSize: "18px" }} />
               ) : (
-                <DescriptionIcon
-                  style={{ color: "#42AEEE", fontSize: "18px" }}
-                />
+                <DescriptionIcon style={{ color: "#42AEEE", fontSize: "18px" }} />
               )}
             </ListItemIcon>
-
-            {/* <ListItemText
-              primary={menu.menuName}
-              sx={{
-                fontWeight: "bold",
-                fontSize: "14px",
-                color: activeMenu === menu.menuId ? "#0056b3" : "var(--grid-menuColor)",
-                transition: "color 0.2s ease-in-out",
-              }}
-            /> */}
             <Tooltip title={menu.menuName} arrow>
-              <ListItemText
-                primary={
-                  open ? menu.menuName : menu.menuName.charAt(0).toUpperCase()
-                } // Show first letter if closed
-                sx={{
-                  fontWeight: "bold",
-                  fontSize: "13px",
-                  color: activeMenu === menu.menuId ? "#0056b3" : "var(--grid-menuColor)",
-                  transition: "color 0.2s ease-in-out",
-                  // Styling for truncation when menu name is long
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
-                }}
-              />
+              <ListItemText primary={open ? menu.menuName : menu.menuName.charAt(0).toUpperCase()} sx={{ fontWeight: "bold", fontSize: "13px", color: activeMenu === menu.menuId ? "#0056b3" : "var(--grid-menuColor)", transition: "color 0.2s ease-in-out", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }} />
             </Tooltip>
           </Box>
-
           {menu.children && menu.children.length > 0 && (
-            <ListItemIcon
-              sx={{
-                paddingRight: "16px",
-                minWidth: "32px",
-                justifyContent: "flex-end",
-                cursor: "pointer",
-                color: "#42AEEE",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleMenu(menu.menuId, menu.parentId);
-              }}
-            >
-              {openMenus.has(menu.menuId) ? (
-                <ExpandLessIcon fontSize="small" />
-              ) : (
-                <ExpandMoreIcon fontSize="small" />
-              )}
+            <ListItemIcon sx={{ paddingRight: "16px", minWidth: "32px", justifyContent: "flex-end", cursor: "pointer", color: "#42AEEE" }} onClick={(e) => { e.stopPropagation(); toggleMenu(menu.menuId, menu.parentId); }}>
+              {openMenus.has(menu.menuId) ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
             </ListItemIcon>
           )}
         </ListItem>
-
-        {openMenus.has(menu.menuId) &&
-          menu.children &&
-          menu.children.length > 0 && (
-            <List sx={{ paddingLeft: 2, backgroundColor: "inherit" }}>
-              {renderMenu(menu.children, level + 1, menu.menuName)}
-            </List>
-          )}
+        {openMenus.has(menu.menuId) && menu.children && menu.children.length > 0 && (
+          <List sx={{ paddingLeft: 2, backgroundColor: "inherit" }}>
+            {renderMenu(menu.children, level + 1, menu.menuName)}
+          </List>
+        )}
       </List>
     ));
   };
 
+  
 
+  interface MenuItem { Icon: any; displayNo: number; menuId: number; items: MenuItem[]; label: string; menuName: string; path: string; }
 
-  interface MenuItem {
-    Icon: any;
-    displayNo: number;
-    menuId: number;
-    items: MenuItem[];
-    label: string;
-    menuName: string;
-    path: string;
-  }
-
-  const handleNavigation = (path: any) => {
-    console.log("Navigating to:", path);
-    navigate(path);
-  };
+  const handleNavigation = (path: any) => { navigate(path); };
 
   const handleAutocompleteChange = (event: any, value: any) => {
     const selectedItem = items.find((item: any) =>
@@ -501,7 +383,6 @@ export default function MiniDrawer({ items }: any) {
       }
     }
   };
-
   const allMenuNames = items.reduce((acc: any, item: { items: any[] }) => {
     if (item.items) {
       return [
@@ -511,35 +392,23 @@ export default function MiniDrawer({ items }: any) {
     }
     return acc;
   }, []);
-
-  const filteredItemed = allMenuNames.filter((item: string) =>
-    item.toLowerCase().includes(searchValue.toLowerCase())
-  );
-
-
+  const filteredItemed = allMenuNames.filter((item: string) => item.toLowerCase().includes(searchValue.toLowerCase()));
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setSearchValue(value);
-
     const expandedMenuIds: any = new Set();
-
     if (value === "") {
-      // If search is cleared, collapse all menus
       setFilteredItems(items);
       setOpenMenus(new Set());
       return;
     }
-
     const filtered = items.reduce((acc: any, menu: any) => {
       if (menu.menuName.toLowerCase().includes(value)) {
         acc.push(menu);
         expandedMenuIds.add(menu.menuId);
       } else if (menu.children) {
-        const filteredChildren = menu.children.filter((child: any) =>
-          child.menuName.toLowerCase().includes(value)
-        );
-
+        const filteredChildren = menu.children.filter((child: any) => child.menuName.toLowerCase().includes(value));
         if (filteredChildren.length > 0) {
           acc.push({ ...menu, children: filteredChildren });
           expandedMenuIds.add(menu.menuId);
@@ -547,19 +416,13 @@ export default function MiniDrawer({ items }: any) {
       }
       return acc;
     }, []);
-
     setFilteredItems(filtered);
     setOpenMenus(expandedMenuIds);
   };
-
   var [date, setDate] = React.useState(new Date());
-
   const options: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+    day: "2-digit", month: "short", year: "numeric",
   };
-
   const formattedDate = date
     .toLocaleDateString("en-US", options)
     .split(" ")
@@ -567,55 +430,44 @@ export default function MiniDrawer({ items }: any) {
       index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)
     )
     .join(" ");
-
   React.useEffect(() => {
     var timer = setInterval(() => setDate(new Date()), 1000);
     return function cleanup() {
       clearInterval(timer);
     };
   });
-
   const handleSubMenuClick = (index: any) => {
     console.log(index);
     setSelectedSubMenu(index);
   };
   const resetHomeColor = () => {
-    // setHomeColor("inherit");
     setHomeColor("#FF0000");
-    // setHomeColor("");
   };
-
   const backgroundStyle = {
     background: "linear-gradient(45deg, #fff, #f0f)",
     backgroundSize: "400% 400%",
   };
-
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
     setMenuOpen(true);
     setHomeColor("inherit");
   };
-
   const handleClose = () => {
     setAnchorEl(null);
     setMenuOpen(false);
   };
-
   const routeChangeHome = () => {
     let path = `/home`;
     navigate(path);
   };
-
   const handleDrawerOpen = () => {
     setOpen(true);
     setOpenlogo(true);
   };
-
   const handleDrawerClose = () => {
     setOpen(false);
     setOpenlogo(false);
   };
-
   const Logout = () => {
     localStorage.removeItem("userdata");
     localStorage.removeItem("username");
@@ -623,15 +475,12 @@ export default function MiniDrawer({ items }: any) {
     localStorage.removeItem("permissions");
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
-    localStorage.clear();  // ✅ Clear all stored data safely
+    localStorage.clear();  //  Clear all stored data safely
     sessionStorage.clear();
-    window.location.href = window.location.origin; // ✅ Redirect to login
+    window.location.href = window.location.origin; //  Redirect to login
     navigate("/");
   };
-
   function onClick(e: any, item: any) {
-    // console.log("Main " + item);
-
     let path = item.path;
     if (path == "" || path == null || path == "undefind") {
       window.alert("Path Not Found ????");
@@ -639,40 +488,20 @@ export default function MiniDrawer({ items }: any) {
       navigate(path);
     }
   }
-
-  // var data = JSON.parse(localStorage.getItem("userdata")!);
-  // var menudata = data[0]["userdetail"];
-  // var username =
-  //   menudata[0]["firsT_NAME"] +
-  //   " " +
-  //   menudata[0]["middlE_NAME"] +
-  //   " " +
-  //   menudata[0]["suR_NAME"];
   const { i18n } = useTranslation();
-
   const changeLanguage = (language: any) => {
-    // console.log("check", language);
-
     i18n.changeLanguage(language);
     localStorage.setItem("preferredLanguage", language);
   };
   var currentLanguage = localStorage.getItem("preferredLanguage");
   var newLanguage = currentLanguage === "hi" ? "English" : "हिंदी";
-
-  //const userData = JSON.parse(localStorage.getItem("userdata")!) || {};
-  // const userDetail = userData[0]?.userdetail || [];
-  // console.log(userDetail);
-
   const collapsehamndle = (index: any) => {
-    // console.log(index);
     if (index == collapseIndex) {
       setCollapseIndex(-1);
     } else {
       setCollapseIndex(index);
     }
   };
-  // console.log("items", items);
-
   const getImageForFirstName = (
     firsT_NAME: any,
     middlE_NAME: any,
@@ -683,162 +512,74 @@ export default function MiniDrawer({ items }: any) {
     const thirdLetter = suR_NAME ? suR_NAME.charAt(0).toUpperCase() : "";
     return `${firstLetter}${secondLetter}${thirdLetter}`;
   };
-
-  const getGenderText = (gendeR_ID: any) => {
-    switch (gendeR_ID) {
-      case 1:
-        return "Male";
-      case 2:
-        return "Female";
-      case 3:
-        return "Other";
-      default:
-        return "Unknown";
-    }
-  };
-
+ 
   const handleMyProfileClick = () => {
-    // console.log("My Profile clicked" + profileDrawerOpen);
     setProfileDrawerOpen(!profileDrawerOpen);
   };
-
   const currentPathname = window.location.pathname;
   const segments = currentPathname.split("/").filter(Boolean);
   const isHomePage = segments.length === 0;
-
   function handleClicked(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     event.preventDefault();
-    // console.info("You clicked a breadcrumb.");
   }
-
   const handleClickhome = () => {
     let path = `/home`;
     navigate(path);
   };
-
   function FirstLetters(props: any) {
     const { text } = props;
-
     const words = text.split(" ");
-
-    // Extract the first letter from each word
     const firstLetters = words.map((word: any) => word.charAt(0));
-
-    // Join the first letters back into a string
     const result = firstLetters.join("");
-
     return <div>{result}</div>;
   }
-
   const handleRightClick = (path: any) => (e: any) => {
     e.preventDefault();
     window.open(path, "_blank");
   };
-
   const [showThemeMenu, setShowThemeMenu] = React.useState(false);
-
   const [userData, setUserData] = React.useState<any>(null);
   const [selectedTheme, setSelectedTheme] = React.useState(() => {
     const storedTheme = localStorage.getItem("theme");
-
     return storedTheme ? storedTheme : themes[0]["name"];
   });
-
   React.useEffect(() => {
     console.log(selectedTheme);
     document.body.className = selectedTheme;
-
     localStorage.setItem("theme", selectedTheme);
   }, [selectedTheme]);
-
   const handleThemeChange = (theme: any) => {
     setSelectedTheme(theme);
     setShowThemeMenu(false);
   };
-
   const handleCloseSelect = () => {
     setShowThemeMenu(false);
   };
-
   const headerColor1 = `var(--header-background)`;
   const drawerStyles = `var(--drawer-background)`;
   let ID: any = localStorage.getItem("username");
-
   if (!ID) {
     console.log("No username found, redirecting to login...");
-    window.location.href = window.location.origin; // ✅ Redirect to login if username is missing
+    window.location.href = window.location.origin; //  Redirect to login if username is missing
   } else {
-    ID = ID.replace(/^"(.*)"$/, "$1"); // ✅ Only replace if ID exists
+    ID = ID.replace(/^"(.*)"$/, "$1"); //  Only replace if ID exists
   }
-
-  // let ID: any = localStorage.getItem("username");
-  // ID = ID.replace(/^"(.*)"$/, "$1");
-  const handlePermissionClick = () => {
-    if (ID) {
-      console.log("id check 175", ID);
-      getNode(ID);
-    } else {
-      toast.error("ID not found");
-    }
-    setIsModalOpen(true);
-    console.log("first");
-  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
-  const getNode = (id: any) => {
-    const collectData = {
-      id: -1,
-      nodeID: -1,
-      titleID: -1,
-      user_Id: id,
-    };
-    api
-      .post(`NewNodeMaster/GetNewNodeMasterHeirarical`, collectData)
-      .then((res: any) => {
-        if (res.data && res.data.data && res.data.data.length > 0) {
-          setTreedata(res.data.data);
-          const allNodeIds = getAllNodeIds(res.data.data);
-          setExpandedItems(allNodeIds);
-        } else {
-          toast.error("Data is null or empty");
-        }
-      });
-  };
-
-  const getAllNodeIds = (nodes: any[]): string[] => {
-    let ids: string[] = [];
-
-    const collectIds = (nodes: any[]) => {
-      nodes.forEach((node) => {
-        ids.push(node.id.toString());
-        if (node.childnode) {
-          collectIds(node.childnode);
-        }
-      });
-    };
-
-    collectIds(nodes);
-
-    return ids;
-  };
+ 
 
   const defaultSelectedNodeId = parseInt(localStorage.getItem("id") + "");
-  // 1. Update user data retrieval in useEffect
   React.useEffect(() => {
     const storedUserData = localStorage.getItem("userdata");
     const storedUsername = localStorage.getItem("username");
-
     if (storedUserData) {
       try {
         const parsedData = JSON.parse(storedUserData);
-        // Handle both possible structures
         const userDetails = parsedData.userDetails || parsedData;
         setUserData({
           ...userDetails,
-          // Fallback to username from separate storage
           userName: userDetails.userName || storedUsername?.replace(/"/g, '') || "User"
         });
       } catch (error) {
@@ -850,7 +591,6 @@ export default function MiniDrawer({ items }: any) {
         });
       }
     } else {
-      // Fallback for missing userdata
       setUserData({
         userName: storedUsername?.replace(/"/g, '') || "User",
         email: "N/A",
@@ -859,64 +599,33 @@ export default function MiniDrawer({ items }: any) {
     }
   }, []);
 
-
-  React.useEffect(() => {
-    // Set default selected node here
-    if (defaultSelectedNodeId) {
-      setCheck([defaultSelectedNodeId]);
-    }
-
-    const initialExpanded = getAllNodeIds(treedata);
-    setExpandedItems(initialExpanded);
-  }, [defaultSelectedNodeId, treedata]);
-
   const [nodeId, setnodeId] = React.useState<any>(0);
   const [nodeNames, setNodeNames] = React.useState<string>("");
-
-  // Effect to apply the theme from local storage
-
   const handleToggle = (id: number, menuName: string) => () => {
     const currentIndex = check.indexOf(id);
-    //const newChecked = [...check];
     const newChecked = currentIndex === -1 ? [id] : [];
-    //const updatedChecked = currentIndex === -1 ? [id] : [];
-
     if (currentIndex === -1) {
       newChecked.push(id);
     } else {
       newChecked.splice(currentIndex, 1);
     }
-
     setCheck(newChecked);
-
-    // setExpandedItems((prevExpanded) =>
-    //   prevExpanded.includes(id.toString())
-    //     ? prevExpanded.filter((item) => item !== id.toString())
-    //     : [...prevExpanded, id.toString()]
-    // );
-
     console.log("Checked data:", menuName);
     console.log("Checked data:", id);
-
     setNodeNames(menuName);
     setnodeId(id);
-    // handleSave(id, name);
   };
-
   const handleSave = () => {
     console.log("handleSave function called");
-
     if (nodeId != 0 || nodeNames != "") {
       localStorage.setItem("id", nodeId);
       localStorage.setItem("nodeName", nodeNames);
       console.log("Checked Save:", { nodeId, nodeNames });
-
       handleCloseModal();
     } else {
       toast.error("Please Retry... Network Issues");
     }
   };
-
   const renderTree = (nodes: any) => (
     <TreeItem
       key={nodes.id}
@@ -925,12 +634,9 @@ export default function MiniDrawer({ items }: any) {
         <div style={{ display: "flex", alignItems: "center" }}>
           <Checkbox
             checked={check.indexOf(nodes.id) !== -1}
-            // onChange={handleToggle(nodes.id)}
-
             onChange={handleToggle(nodes.id, nodes.menuName)}
             onClick={(event: any) => event.stopPropagation()}
           />
-
           <div style={{ marginLeft: 8 }}>{nodes.menuName}</div>
         </div>
       }
@@ -941,7 +647,6 @@ export default function MiniDrawer({ items }: any) {
         : null}
     </TreeItem>
   );
-
   const toggleExpansion = (nodeId: string) => {
     if (expandedItems.includes(nodeId)) {
       setExpandedItems(expandedItems.filter((item) => item !== nodeId));
@@ -949,327 +654,117 @@ export default function MiniDrawer({ items }: any) {
       setExpandedItems([...expandedItems, nodeId]);
     }
   };
-  //   const userData = JSON.parse(localStorage.getItem("userdata") || "{}");
-  //   const userName = userData?.userDetails?.userName || "User";
-
   return (
     <Box sx={{ display: "flex" }}>
-      {/* <CssBaseline /> */}
-      <AppBar position="fixed" open={open} style={{}}>
-        <Toolbar
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            background: `var(--header-background1)`,
-            color: `var(--header-color1)`,
-          }}
-        >
-             <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              // paddingTop: "10px",
-              // paddingBottom: "10px",
-            }}
-          >
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{
-                // marginRight: 5,
-                ...(open && { display: "none" }),
-              }}
-            >
-              <MenuIcon fontSize="large" />
-            </IconButton>
+    <AppBar position="fixed" open={open} style={{}}>
+  <Toolbar style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: `var(--header-background1)`, color: `var(--header-color1)` }}>
+    <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+      <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerOpen} edge="start" sx={{ ...(open && { display: "none" }) }}>
+        <MenuIcon fontSize="large" />
+      </IconButton>
+      {!openlogo && <img src={logo} width={60} height={60} />}
+    </div>
+    <div style={{ fontSize: "2.5vw" }}>
+      <div style={{ fontFamily: "Georgia, serif" }}>
+        <span style={{ fontSize: "3vw", color: "#FFAE35" }}>V</span>
+        <span style={{ fontSize: "2.2vw" }}>ehicle </span>
+        <span style={{ fontSize: "3vw", color: "#D50E00" }}>W</span>
+        <span style={{ fontSize: "2.2vw" }}>orkshop </span>
+        <span style={{ fontSize: "3vw", color: "#FFE100" }}>M</span>
+        <span style={{ fontSize: "2.2vw" }}>anagement </span>
+        <span style={{ fontSize: "3vw", color: "#e69f9f" }}>S</span>
+        <span style={{ fontSize: "2.2vw" }}>ystem</span>
+      </div>
+    </div>
+    <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }} aria-controls={open ? "account-menu" : undefined} aria-haspopup="true" aria-expanded={open ? "true" : undefined}>
+      <Avatar sx={{ width: 40, height: 40, bgcolor: "#2196F3", color: "white" }}>
+        {localStorage.getItem("username")?.replaceAll('"', "").charAt(0).toUpperCase()}
+      </Avatar>
+    </IconButton>
+    <Menu anchorEl={anchorEl} id="account-menu" open={menuOpen} onClick={handleClose} PaperProps={{ elevation: 0, sx: { backgroundColor: `var(--menu-background)`, color: `var(--menu-color)`, overflow: "auto", filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))", paddingRight: "5px", paddingLeft: "5px", mt: 1.5, "& .MuiAvatar-root": { width: 32, height: 32, ml: -0.5, mr: 1 }, "&::before": { content: '""', display: "block", position: "absolute", top: 0, right: 14, width: 10, height: 10, bgcolor: "background.paper", transform: "translateY(-50%) rotate(45deg)", zIndex: 0 } } }} transformOrigin={{ horizontal: "right", vertical: "top" }} anchorOrigin={{ horizontal: "right", vertical: "bottom" }}>
+      <MenuItem onClick={handleClose}>
+        <ListItemIcon><img src={logged} width={40} height={40} /></ListItemIcon> {localStorage.getItem("username")?.replaceAll('"', "")}
+      </MenuItem>
+      <MenuItem onClick={handleMyProfileClick}>
+        <ListItemIcon><img src={id} width={30} height={30} /></ListItemIcon> My Profile
+      </MenuItem>
+      <Divider />
+      <MenuItem onClick={() => { localStorage.getItem("preferredLanguage") == "hi" ? changeLanguage("en") : changeLanguage("hi"); }}>
+        <ListItemIcon><img src={trans} width={30} height={30} /></ListItemIcon> Translate -- {newLanguage}
+      </MenuItem>
+      <MenuItem onClick={() => setShowThemeMenu(!showThemeMenu)}>
+        <ListItemIcon><img src={ThemeIcon} width={30} height={30} /></ListItemIcon> Select Theme
+      </MenuItem>
+      <MenuItem onClick={() => { let path = "/Admin/HelpDesk"; navigate(path, { state: { activeMenu } }); }}>
+        <ListItemIcon><img src={help} width={30} height={30} alt="Help Desk" /></ListItemIcon> Help Desk
+      </MenuItem>
+      <MenuItem onClick={() => navigate("/admin/flowmaster")}>
+        <ListItemIcon><img src={ThemeIcon1} width={30} height={30} /></ListItemIcon> Flow Master
+      </MenuItem>
+      <Divider />
+      <MenuItem onClick={Logout}>
+        <ListItemIcon><img src={logout} width={30} height={30} /></ListItemIcon> Logout
+      </MenuItem>
+    </Menu>
+  </Toolbar>
+  <Dialog open={showThemeMenu} onClose={handleCloseSelect}>
+    <DialogTitle>Select a Theme</DialogTitle>
+    <DialogContent>
+  <List>
+    {themes.map((theme) => (
+      <ListItem
+        key={theme.name}
+        component="div" // Or remove this line entirely
+        sx={{
+          cursor: 'pointer',
+          backgroundColor: selectedTheme === theme.name ? 'action.selected' : 'inherit',
+          '&:hover': { backgroundColor: 'action.hover' }
+        }}
+        onClick={() => handleThemeChange(theme.name)}
+      >
+        {theme.icon}
+        <span style={{ marginLeft: "10px" }}>{theme.name}</span>
+      </ListItem>
+    ))}
+  </List>
+</DialogContent>
+    <DialogActions>
+      <Button onClick={handleCloseSelect}>Cancel</Button>
+    </DialogActions>
+  </Dialog>
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: headerColor1, borderBottomRightRadius: "15px" }}>
+    <div role="presentation" onClick={handleClicked}>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#fff" }}>
+        <Typography sx={{ display: "flex", color: "#fff", alignItems: "center" }}>
+          <Link underline="hover" sx={{ display: "flex", color: "#fff", alignItems: "center", cursor: "pointer" }} color="inherit" onClick={handleClickhome}>
+            <HomeIcon sx={{ ml: 1, mr: 1 }} fontSize="inherit" />
+            Home
+          </Link>
+        </Typography>
+        {segments.slice(1).map((segment, index) => (
+          <Typography key={index} sx={{ display: "flex", color: "#fff", alignItems: "center" }}>
+            {index > 0 && " / "}
+            {index === segments.length - 2 ? (
+              <span> {segment} </span>
+            ) : (
+              <Link underline="hover" sx={{ display: "flex", color: "#fff", alignItems: "center" }} color="inherit" href={`/${segments.slice(0, index + 1).join("/")}`}>
+                {segment}
+              </Link>
+            )}
+          </Typography>
+        ))}
+      </Breadcrumbs>
+    </div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 15, paddingRight: "15px" }}>
+      <p style={{ fontSize: "1.2vw", color: greeting.color }}>
+        {greeting.icon} {greeting.text}
+      </p>
+      <p> Time : {date.toLocaleTimeString()}</p>
+      <p> Date : {formattedDate}</p>
+    </div>
+  </div>
+</AppBar>
 
-            {!openlogo && <img src={logo} width={60} height={60} />}
-          </div>
-
-          <div style={{ fontSize: "2.5vw" }}>
-            <div style={{ fontFamily: "Georgia, serif" }}>
-              <span style={{ fontSize: "3vw", color: "#FFAE35" }}>V</span>
-              <span style={{ fontSize: "2.2vw" }}>ehicle </span>
-              <span style={{ fontSize: "3vw", color: "#D50E00" }}>W</span>
-              <span style={{ fontSize: "2.2vw" }}>orkshop </span>
-              <span style={{ fontSize: "3vw", color: "#FFE100" }}>M</span>
-              <span style={{ fontSize: "2.2vw" }}>anagement </span>
-              <span style={{ fontSize: "3vw", color: "#e69f9f" }}>S</span>
-              <span style={{ fontSize: "2.2vw" }}>ystem</span>
-            </div>
-          </div>
-
-          <IconButton
-            onClick={handleClick}
-            size="small"
-            sx={{ ml: 2 }}
-            aria-controls={open ? "account-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-          >
-            <Avatar sx={{
-              width: 40,
-              height: 40,
-              bgcolor: "#2196F3",
-              color: "white"
-            }}>
-              {localStorage.getItem("username")?.replaceAll('"', "").charAt(0).toUpperCase()}
-              {/* {userData?.userName?.charAt(0).toUpperCase() || "U"} */}
-            </Avatar>
-          </IconButton>
-
-          <Menu
-            anchorEl={anchorEl}
-            id="account-menu"
-            open={menuOpen}
-            // onClose={handleClose}
-            onClick={handleClose}
-            PaperProps={{
-              elevation: 0,
-              sx: {
-                backgroundColor: `var(--menu-background)`,
-                color: `var(--menu-color)`,
-                overflow: "auto",
-                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                paddingRight: "5px",
-                paddingLeft: "5px",
-                mt: 1.5,
-                "& .MuiAvatar-root": {
-                  width: 32,
-                  height: 32,
-                  ml: -0.5,
-                  mr: 1,
-                },
-                "&::before": {
-                  content: '""',
-                  display: "block",
-                  position: "absolute",
-                  top: 0,
-                  right: 14,
-                  width: 10,
-                  height: 10,
-                  bgcolor: "background.paper",
-                  transform: "translateY(-50%) rotate(45deg)",
-                  zIndex: 0,
-                },
-              },
-            }}
-            transformOrigin={{ horizontal: "right", vertical: "top" }}
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          >
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <img src={logged} width={40} height={40} />
-              </ListItemIcon>{" "}
-              {/* {username} */}
-              {localStorage.getItem("username")?.replaceAll('"', "")}
-            </MenuItem>
-
-            {/* <MenuItem > */}
-            <MenuItem onClick={handleMyProfileClick}>
-              <ListItemIcon>
-                <img src={id} width={30} height={30} />
-              </ListItemIcon>
-              My Profile
-
-            </MenuItem>
-
-            <Divider />
-
-            <MenuItem
-              onClick={() => {
-                localStorage.getItem("preferredLanguage") == "hi"
-                  ? changeLanguage("en")
-                  : changeLanguage("hi");
-              }}
-            >
-              <ListItemIcon>
-                <img src={trans} width={30} height={30} />
-              </ListItemIcon>
-              Translate -- {newLanguage}
-            </MenuItem>
-
-            {/* <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <img src={settings} width={30} height={30} />
-              </ListItemIcon>
-              Settings
-            </MenuItem> */}
-
-            {/* <MenuItem onClick={handlePermissionClick}>
-              <ListItemIcon>
-                <img src={logged} width={40} height={40} alt="Permission" />
-              </ListItemIcon>
-              Permission
-            </MenuItem> */}
-
-            <MenuItem onClick={() => setShowThemeMenu(!showThemeMenu)}>
-              <ListItemIcon>
-                <img src={ThemeIcon} width={30} height={30} />
-              </ListItemIcon>
-              Select Theme
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                let path = "/Admin/HelpDesk";
-                // localStorage.setItem("menuData", menuData.toString());
-                navigate(path, { state: { activeMenu } })
-                //window.open(path, "_blank");
-              }}
-            >
-              <ListItemIcon>
-                <img src={help} width={30} height={30} alt="Help Desk" />
-              </ListItemIcon>
-              Help Desk
-            </MenuItem>
-
-            <MenuItem onClick={() => navigate("/admin/flowmaster")}>
-              <ListItemIcon>
-                <img src={ThemeIcon1} width={30} height={30} />
-              </ListItemIcon>
-              Flow Master
-            </MenuItem>
-
-            <Divider />
-            <MenuItem onClick={Logout}>
-              <ListItemIcon>
-                <img src={logout} width={30} height={30} />
-              </ListItemIcon>
-              Logout
-            </MenuItem>
-          </Menu>
-        </Toolbar>
-
-        <Dialog open={showThemeMenu} onClose={handleCloseSelect}>
-          <DialogTitle>Select a Theme</DialogTitle>
-          <DialogContent>
-            <List>
-              {themes.map((theme) => (
-                <ListItem
-                  button
-                  key={theme.name}
-                  onClick={() => handleThemeChange(theme.name)}
-                  selected={selectedTheme === theme.name}
-                >
-                  {theme.icon}
-                  <span style={{ marginLeft: "10px" }}>{theme.name}</span>
-                </ListItem>
-              ))}
-            </List>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseSelect}>Cancel</Button>
-          </DialogActions>
-        </Dialog>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            backgroundColor: headerColor1,
-            borderBottomRightRadius: "15px",
-          }}
-        >
-          <div
-            role="presentation"
-            onClick={handleClicked}
-          // style={{  borderBottomRightRadius: "15px" }}
-          >
-            <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#fff" }}>
-              {/* <Link
-                underline="hover"
-                sx={{ display: "flex", alignItems: "center" }}
-                color="inherit"
-                href="/"
-              >
-                <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-                Home
-              </Link> */}
-              <Typography
-                sx={{
-                  display: "flex",
-                  color: "#fff",
-                  alignItems: "center",
-                }}
-              >
-                <Link
-                  underline="hover"
-                  sx={{
-                    display: "flex",
-                    color: "#fff",
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  color="inherit"
-                  onClick={handleClickhome}
-                >
-                  <HomeIcon sx={{ ml: 1, mr: 1 }} fontSize="inherit" />
-                  Home
-                </Link>
-              </Typography>
-
-              {/* Render the rest of the breadcrumb path */}
-              {segments.slice(1).map((segment, index) => (
-                <Typography
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    color: "#fff",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* {" / "} */}
-                  {index > 0 && " / "}
-                  {index === segments.length - 2 ? (
-                    <span>
-                      {" "}
-                      {/* <GrainIcon sx={{ mr: 0.5 }} fontSize="inherit" /> */}
-                      {segment}
-                    </span>
-                  ) : (
-                    <Link
-                      underline="hover"
-                      sx={{
-                        display: "flex",
-                        color: "#fff",
-                        alignItems: "center",
-                      }}
-                      color="inherit"
-                      href={`/${segments.slice(0, index + 1).join("/")}`}
-                    >
-                      {/* <WhatshotIcon sx={{ mr: 0.5 }} fontSize="inherit" /> */}
-                      {segment}
-                    </Link>
-                  )}
-                </Typography>
-              ))}
-            </Breadcrumbs>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 15,
-              paddingRight: "15px",
-            }}
-          >
-            <p style={{ fontSize: "1.2vw", color: greeting.color }}>
-              {greeting.icon} {greeting.text}
-            </p>
-            <p> Time : {date.toLocaleTimeString()}</p>
-            <p> Date : {formattedDate}</p>
-          </div>
-        </div>
-      </AppBar>
-
-      {/* {open && ( */}
       <Drawer
         variant="permanent"
         open={open}
@@ -1277,10 +772,10 @@ export default function MiniDrawer({ items }: any) {
           sx: {
             backgroundColor: drawerStyles,
             color: `var(--drawer-color)`,
-            width: drawerWidth,
+            width: DRAWER_WIDTH,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
+              width: DRAWER_WIDTH,
               boxSizing: "border-box",
             },
           },
@@ -1288,67 +783,39 @@ export default function MiniDrawer({ items }: any) {
       >
         <DrawerHeader>
           <>
-            <Stack
-              sx={{ width: "100%", height: "16vh" }}
-              direction="row"
-              justifyContent="center"
-            >
+            <Stack sx={{ width: "100%", height: "16vh" }} direction="row" justifyContent="center">
               {openlogo ? (
-                <div
-                  style={{
-                    paddingTop: "25px",
-                    paddingBottom: "25px",
-                  }}
-                >
+                <div style={{ paddingTop: "25px", paddingBottom: "25px" }}>
                   <img src={loged} width={100} height={100} />
                 </div>
               ) : (
                 <div style={{ padding: 0 }}></div>
               )}
             </Stack>
-
             <IconButton onClick={handleDrawerClose}>
-              {theme.direction === "rtl" ? (
-                <ChevronRightIcon />
-              ) : (
-                <ChevronLeftIcon />
-              )}
+              {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
             <br />
             <br />
           </>
         </DrawerHeader>
-
         <br />
         <br />
         <Divider />
         {openlogo && (
-          <Paper
-            component="form"
-            sx={{
-              m: "5px 5px",
-              p: "0px 2px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
+          <Paper component="form" sx={{ m: "5px 5px", p: "0px 2px", display: "flex", alignItems: "center" }}>
             <Autocomplete
               freeSolo
               fullWidth
               size="small"
               options={items.reduce((acc: any, item: any) => {
-                if (item.items) {
-                  acc.push(
-                    ...item.items.map((subItem: any) => subItem.menuName)
-                  );
-                }
+                if (item.items) acc.push(...item.items.map((subItem: any) => subItem.menuName));
                 return acc;
               }, [])}
               onChange={handleAutocompleteChange}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  //label="Search Menu"
                   placeholder="Search Menu"
                   variant="outlined"
                   InputProps={{
@@ -1365,44 +832,25 @@ export default function MiniDrawer({ items }: any) {
             />
           </Paper>
         )}
-        <Divider />
 
+        <Divider />
         <React.Fragment>
-          {/* Home List */}
           <List sx={{ padding: 0 }}>
             {["Home"].map((text, index) => (
               <ListItem
                 key={text}
                 disablePadding
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: 0,
-                  "&:hover": {
-                    cursor: "pointer",
-                    backgroundColor: "inherit",
-                  },
+                  display: "flex", justifyContent: "space-between", alignItems: "center", padding: 0,
+                  "&:hover": { cursor: "pointer", backgroundColor: "inherit" }
                 }}
               >
                 <ListItemButton
-                  sx={{
-                    justifyContent: open ? "initial" : "center",
-                    px: 4.5,
-                    backgroundColor: "inherit",
-                  }}
-                  onClick={() => {
-                    routeChangeHome();
-                    resetHomeColor();
-                  }}
+                  sx={{ justifyContent: open ? "initial" : "center", px: 4.5, backgroundColor: "inherit" }}
+                  onClick={() => { routeChangeHome(); resetHomeColor(); }}
                 >
                   <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 1 : "auto",
-                      justifyContent: "center",
-                      color: homeColor,
-                    }}
+                    sx={{ minWidth: 0, mr: open ? 1 : "auto", justifyContent: "center", color: homeColor }}
                   >
                     <HomeIcon />
                   </ListItemIcon>
@@ -1411,29 +859,18 @@ export default function MiniDrawer({ items }: any) {
               </ListItem>
             ))}
           </List>
-
-          {/* Dynamic Items List */}
           {renderMenu(filteredItems.length > 0 ? filteredItems : items)}
         </React.Fragment>
       </Drawer>
-      {/* )} */}
-      {/* <Box  sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
-      </Box> */}
-
       <Modal open={isModalOpen} onClose={handleCloseModal}>
-        <Box sx={style}>
-          <Typography fontWeight={500} fontSize={20} noWrap align="center">
-            Node Permission
-          </Typography>
+        <Box sx={modalStyle}>
+          <Typography fontWeight={500} fontSize={20} noWrap align="center">Node Permission</Typography>
           <div>
             <Grid xs={12} item>
               <Box>
                 <div style={{ height: "400px", overflow: "auto" }}>
                   <SimpleTreeView expandedItems={expandedItems}>
-                    {Array.isArray(treedata)
-                      ? treedata.map((node: any) => renderTree(node))
-                      : null}
+                    {Array.isArray(treedata) ? treedata.map((node: any) => renderTree(node)) : null}
                   </SimpleTreeView>
                 </div>
               </Box>
@@ -1442,11 +879,7 @@ export default function MiniDrawer({ items }: any) {
               <Button
                 type="submit"
                 fullWidth
-                style={{
-                  backgroundColor: "#059669",
-                  color: "white",
-                  marginTop: "10px",
-                }}
+                style={{ backgroundColor: "#059669", color: "white", marginTop: "10px" }}
                 onClick={(e: any) => handleSave()}
               >
                 {t("text.save")}
@@ -1460,7 +893,6 @@ export default function MiniDrawer({ items }: any) {
         sx={{ width: 10, height: 30, cursor: "pointer" }}
         onClick={() => setProfileDrawerOpen(true)}
       />
-
       <SwipeableDrawer
         anchor="left"
         open={profileDrawerOpen}
@@ -1468,104 +900,39 @@ export default function MiniDrawer({ items }: any) {
         onOpen={() => { }}
         style={{ zIndex: 1300 }}
       >
-        <Box sx={{ width: drawerWidth }}>
-          {/* Close Button */}
-          <IconButton
-            edge="end"
-            onClick={() => setProfileDrawerOpen(false)}
-            sx={{ position: "absolute", right: 15, top: 2, color: "white" }}
-          >
+        <Box sx={{ width: DRAWER_WIDTH }}>
+          <IconButton edge="end" onClick={() => setProfileDrawerOpen(false)} sx={{ position: "absolute", right: 15, top: 2, color: "white" }}>
             <CloseIcon />
           </IconButton>
-          
-          {/* Centered Avatar Section */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              pt: 8,
-              pb: 4,
-              backgroundImage: "linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d)",
-              color: "whitesmoke",
-              borderBottomLeftRadius: "1px",
-              borderBottomRightRadius: "1px",
-            //  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-              color: 'white'
-            }}
-          >
-             
-            <Avatar
-              sx={{
-                width: 80,
-                height: 80,
-                mb: 0,
-                bgcolor: 'white',
-                color: '#2196F3',
-                fontSize: '2.5rem',
-                border: '4px solid white'
-              }}
-            >
-              {(userData?.userName || 'U').charAt(0).toUpperCase()}
-            </Avatar>
-            <Typography variant="h6" align="center">
-              {userData?.userName || 'User'}
-            </Typography>
-            <Typography variant="body2" align="center" sx={{ mt: 1 }}>
-              {userData?.email || 'user@example.com'}
-            </Typography>
-          </Box>
+          <Box sx={{ height: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 1, pb: 2, backgroundImage: 'linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d)', color: 'whitesmoke', borderBottomLeftRadius: '1px', borderBottomRightRadius: '1px' }}>
+  <Avatar sx={{ width: 60, height: 60, mb: 0, bgcolor: 'white', color: '#2196F3', fontSize: '1.8rem', border: '3px solid white' }}>{(userData?.userName || 'U').charAt(0).toUpperCase()}</Avatar>
+  <Typography variant="subtitle1" align="center">{userData?.userName || 'User'}</Typography>
+  <Typography variant="caption" align="center" sx={{ mt: 0.5 }}>{userData?.email || 'user@example.com'}</Typography>
+</Box>
 
-          {/* Details Section */}
           <Box sx={{ p: 3 }}>
             <List>
               <ListItem>
-                <ListItemIcon>
-                  <img src={id} width={30} height={30} alt="ID" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="User ID"
-                  secondary={userData?.userName || 'N/A'}
-                />
+                <ListItemIcon><img src={id} width={30} height={30} alt="ID" /></ListItemIcon>
+                <ListItemText primary="User ID" secondary={userData?.userName || 'N/A'} />
               </ListItem>
-
               <ListItem>
-                <ListItemIcon>
-                  <img src={emails} width={30} height={30} alt="Email" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Email"
-                  secondary={userData?.email || 'Not provided'}
-                />
+                <ListItemIcon><img src={emails} width={30} height={30} alt="Email" /></ListItemIcon>
+                <ListItemText primary="Email" secondary={userData?.email || 'Not provided'} />
               </ListItem>
-
               <ListItem>
-                <ListItemIcon>
-                  <img src={call} width={30} height={30} alt="Phone" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Phone Number"
-                  secondary={userData?.phoneNumber || 'Not provided'}
-                />
+                <ListItemIcon><img src={call} width={30} height={30} alt="Phone" /></ListItemIcon>
+                <ListItemText primary="Phone Number" secondary={userData?.phoneNumber || 'Not provided'} />
               </ListItem>
-
               <ListItem>
-                <ListItemIcon>
-                  <img src={logged} width={30} height={30} alt="Status" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Account Status"
-                  secondary={userData?.iS_ACTIVE ? 'Inactive❌ ' : 'Active ✅'}
-                />
+                <ListItemIcon><img src={logged} width={30} height={30} alt="Status" /></ListItemIcon>
+                <ListItemText primary="Account Status" secondary={userData?.iS_ACTIVE ? 'Inactive❌' : 'Active ✅'} />
               </ListItem>
             </List>
           </Box>
         </Box>
       </SwipeableDrawer>
-
-
     </Box>
   );
 }
-
 
