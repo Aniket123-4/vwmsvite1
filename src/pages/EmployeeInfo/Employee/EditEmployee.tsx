@@ -201,14 +201,7 @@ const EditEmployee = (props: Props) => {
     setPanOpen(false);
   };
 
-  // const modalOpenHandle = (event: any) => {
-  //     setPanOpen(true);
-  //     let base = "data:image/jpg;base64";
-  //     if (event === "imageFile") {
-  //         setModalImg(base + formik.values.imageFile);
-  //     }
-  // };
-
+ 
   const handlePanClose1 = () => {
     setOpen(false);
   };
@@ -300,20 +293,7 @@ const EditEmployee = (props: Props) => {
     empPanNumber: Yup.string()
       .matches(/^[A-Z]{3}[A-ZHPTCF][A-Z]\d{4}[A-Z]$/, "Invalid PAN format")
       .required(t("text.PanNoRequired")),
-    // empPerAddress: Yup.string().test(
-    //   "required",
-    //   t("text.PermanentAddressRequired"),
-    //   function (value: any) {
-    //     return value && value.trim() !== "";
-    //   }
-    // ),
-    // empPincode: Yup.string().test(
-    //   "required",
-    //   t("text.PincodeRequired"),
-    //   function (value: any) {
-    //     return value && value.trim() !== "";
-    //   }
-    // ),
+   
     empAddharNo: Yup.string()
       .required(t("text.AdharNoRequired"))
       .test("len", "Aadhaar number must be exactly 12 digits", (val: any) =>
@@ -400,45 +380,7 @@ const EditEmployee = (props: Props) => {
           "isSelected": true
         }
       ],
-      // "registerModel": {
-      //   "id": (location.state?.id || "").toString(),
-      //   "username": location.state?.username,
-      //   "email": location.state?.email,
-      //   "password": location.state?.password,
-      //   "role": location.state?.role
-      // },
-      // "userPermission": [
-      //   {
-      //     "sno": location.state?.sno,
-      //     "userId": location.state?.userId,
-      //     "menuId": location.state?.menuId,
-      //     "parentId": location.state?.parentId,
-      //     "isAdd": true,
-      //     "isEdit": true,
-      //     "isDel": true,
-      //     "isView": true,
-      //     "isPrint": true,
-      //     "isExport": true,
-      //     "isRelease": true,
-      //     "isPost": true,
-      //     "menuName": location.state?.menuName,
-      //     "srn": location.state?.srn
-      //   }
-      // ],
-      // "listCommGroup": [
-      //   {
-      //     "groupId": location.state?.groupId ,
-      //     "name": location.state?.name,
-      //     "description": location.state?.description,
-      //     "type": location.state?.type,
-      //     "isActive": true,
-      //     "createdBy": location.state?.createdBy,
-      //     "updatedBy": location.state?.updatedBy,
-      //     "createdOn": location.state?.createdOn,
-      //     "updatedOn": location.state?.updatedOn,
-      //     "isSelected": true
-      //   }
-      // ],
+     
       "zoneName": location.state?.zoneName,
       "designationName": location.state?.designationName,
       "departmentName": location.state?.departmentName,
@@ -556,14 +498,16 @@ const EditEmployee = (props: Props) => {
 
               {/* emp name */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterEmpName")}
                   value={formik.values.empName}
-                  onChangeText={(text: string) =>
-                    handleConversionChange("empName", text)
-                  }
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("empName", event.target.value)}
+                
                   required={true}
-                  lang={lang}
+               
                 />
 
                 {formik.touched.empName && formik.errors.empName && (
@@ -599,27 +543,26 @@ const EditEmployee = (props: Props) => {
 
               {/* father name */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterFatherName")}
                   value={formik.values.empFatherName}
-                  onChangeText={(text: string) =>
-                    handleConversionChange("empFatherName", text)
-                  }
-                  required={false}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("empFatherName", event.target.value)}
                 />
               </Grid>
 
               {/* Mother name */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterMotherName")}
                   value={formik.values.empMotherName}
-                  onChangeText={(text: string) =>
-                    handleConversionChange("empMotherName", text)
-                  }
-                  required={false}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("empMotherName", event.target.value)}
+                 
                 />
               </Grid>
 
@@ -932,11 +875,12 @@ const EditEmployee = (props: Props) => {
 
               {/* Permanent address */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterPermanentAddress")}
-                  onChangeText={(text: string) => formik.setFieldValue("empPerAddress", text)}
-                  required={false}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("empPerAddress", event.target.value)}
                   value={formik.values.empPerAddress}
                 />
 
@@ -944,14 +888,14 @@ const EditEmployee = (props: Props) => {
 
               {/* Local address */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterLocalAddress")}
-                  onChangeText={(text: string) => formik.setFieldValue("empLocalAddress", text)}
-                  required={false}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("empLocalAddress", event.target.value)}                 
                   value={formik.values.empLocalAddress}
                 />
-
               </Grid>
 
 

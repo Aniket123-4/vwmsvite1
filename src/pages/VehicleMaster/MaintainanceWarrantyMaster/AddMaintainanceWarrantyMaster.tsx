@@ -114,7 +114,7 @@ const AddMaintainanceWarrantyMaster = (props: Props) => {
     const response = await api.post(`Master/GetVendorMaster`, collectData);
     const data = response.data.data;
     //console.log("Vendor data==>  ",data);
-    const arr = [];
+    const arr:any = [];
     for (let index = 0; index < data.length; index++) {
       arr.push({
         label: data[index]["name"],

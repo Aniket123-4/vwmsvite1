@@ -695,26 +695,25 @@ const InstituteEdit = (props: Props) => {
 
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.InstituteName")}
                                     value={formik.values.insname}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("insname", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("insname", event.target.value)}
+                                   
                                 />
                             </Grid>
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.ShortName")}
                                     value={formik.values.shortName}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("shortName", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("shortName", event.target.value)}
                                 />
                             </Grid>
 
@@ -819,25 +818,26 @@ const InstituteEdit = (props: Props) => {
 
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.Address")}
                                     value={formik.values.address}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("address", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("address", event.target.value)}
+                                  
                                 />
                             </Grid>
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.District")}
                                     value={formik.values.district}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("district", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("district", event.target.value)}
+                                    
                                 />
                             </Grid>
 
@@ -868,47 +868,46 @@ const InstituteEdit = (props: Props) => {
 
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.Category")}
                                     value={formik.values.collegeCategory}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("collegeCategory", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("collegeCategory", event.target.value)}
+                                  
                                 />
                             </Grid>
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.Principal")}
                                     value={formik.values.principal}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("principal", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("principal", event.target.value)}
                                 />
                             </Grid>
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.collegeStatus")}
                                     value={formik.values.collegeStatus}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("collegeStatus", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("collegeStatus", event.target.value)}
+                              
                                 />
                             </Grid>
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.ResidencialAddress")}
                                     value={formik.values.resiAddress}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("resiAddress", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("resiAddress", event.target.value)}
+                                 
                                 />
                             </Grid>
                             <Grid md={4} item>
@@ -936,27 +935,27 @@ const InstituteEdit = (props: Props) => {
 
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.EnterOfficeNo")}
                                     value={formik.values.officeNo}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("officeNo", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("officeNo", event.target.value)}
+                                  
                                 />
                             </Grid>
 
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.ResiNO")}
                                     value={formik.values.resiNo}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("resiNo", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("resiNo", event.target.value)}
+                                   
                                 />
                             </Grid>
 
@@ -1041,37 +1040,39 @@ const InstituteEdit = (props: Props) => {
                                 />
                             </Grid>
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.DistrictArea")}
                                     value={formik.values.districtArea}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("districtArea", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("districtArea", event.target.value)}
+                                    
                                 />
                             </Grid>
 
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.StatusPg")}
                                     value={formik.values.statusPG}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("statusPG", text)
-                                    }
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("statusPG", event.target.value)}
+                                   
                                     required={false}
                                     lang={lang}
                                 />
                             </Grid>
                             <Grid md={4} item>
-                                <TranslateTextField
+                                <TextField
                                     label={t("text.Registrar")}
                                     value={formik.values.registrar}
-                                    onChangeText={(text: string) =>
-                                        handleConversionChange("registrar", text)
-                                    }
-                                    required={false}
-                                    lang={lang}
+                                    size="small"
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={(event) => formik.setFieldValue("registrar", event.target.value)}
+                                    
                                 />
                             </Grid>
 

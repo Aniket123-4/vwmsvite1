@@ -117,13 +117,7 @@ const EditVendor = (props: Props) => {
     setPanOpen(false);
   };
 
-  // const modalOpenHandle = (event: any) => {
-  //     setPanOpen(true);
-  //     let base = "data:image/jpg;base64";
-  //     if (event === "imageFile") {
-  //         setModalImg(base + formik.values.imageFile);
-  //     }
-  // };
+ 
 
   const handlePanClose1 = () => {
     setOpen(false);
@@ -219,20 +213,7 @@ const EditVendor = (props: Props) => {
     panNumber: Yup.string()
       .matches(/^[A-Z]{3}[A-ZHPTCF][A-Z]\d{4}[A-Z]$/, "Invalid PAN format")
       .required(t("text.PanNoRequired")),
-    // permanentAddress: Yup.string().test(
-    //   "required",
-    //   t("text.PermanentAddressRequired"),
-    //   function (value: any) {
-    //     return value && value.trim() !== "";
-    //   }
-    // ),
-    // pincode: Yup.string().test(
-    //   "required",
-    //   t("text.PincodeRequired"),
-    //   function (value: any) {
-    //     return value && value.trim() !== "";
-    //   }
-    // ),
+ 
     addharNo: Yup.string()
       .required(t("text.AdharNoRequired"))
       .test("len", "Aadhaar number must be exactly 12 digits", (val: any) =>
@@ -279,9 +260,7 @@ const EditVendor = (props: Props) => {
         Object.entries(values).filter(([_, value]) => value !== "")
       );
 
-      // console.log("Before submission formik values", filteredValues);
-
-      // Handle form submission
+   
       try {
         const response = await api.post(
           `Master/UpsertVendorMaster`,
@@ -387,14 +366,14 @@ const EditVendor = (props: Props) => {
 
               {/* organisation name */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.vendorName")}
                   value={formik.values.name}
-                  onChangeText={(text: string) =>
-                    handleConversionChange("name", text)
-                  }
-                  required={true}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("name", event.target.value)}
+                 
                 />
               </Grid>
 
@@ -428,18 +407,15 @@ const EditVendor = (props: Props) => {
 
               {/* contact Person */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.contactPerson")}
                   value={formik.values.contactPerson}
-                  onChangeText={(text: string) =>
-                    handleConversionChange("contactPerson", text)
-                  }
-                  required={false}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("name", event.target.value)}
                 />
-
               </Grid>
-
               {/* mobile */}
               <Grid item lg={4} xs={12}>
                 <TextField
@@ -580,11 +556,15 @@ const EditVendor = (props: Props) => {
 
               {/* office address */}
               <Grid item lg={4} xs={12}>
-                <TranslateTextField
+                <TextField
                   label={t("text.OfficeAddress")}
-                  onChangeText={(text: string) => formik.setFieldValue("permanentAddress", text)}
-                  required={false}
-                  lang={lang}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("permanentAddress", event.target.value)}
+
+                  // onChangeText={(text: string) => formik.setFieldValue("permanentAddress", text)}
+                
                   value={formik.values.permanentAddress}
                 />
 

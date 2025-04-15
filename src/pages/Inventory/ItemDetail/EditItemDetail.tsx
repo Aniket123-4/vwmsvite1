@@ -339,12 +339,20 @@ const EditItemDetail = (props: Props) => {
                 </FormGroup>
               </Grid> */}
               <Grid item xs={12} sm={4} lg={4}>
-                <TranslateTextField
+                <TextField
                   label={t("text.enteritemName")}
                   value={formik.values.itemName}
-                  onChangeText={(text) => handleConversionChange("itemName", text)}
+                
+                  onChange={(event) => formik.setFieldValue("itemName", event.target.value)}
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  // onChangeText={(text) => handleConversionChange("itemName", text)}
                   required={true}
                   lang={lang}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
                 {formik.touched.itemName && formik.errors.itemName ? (
                   <div style={{ color: "red", margin: "5px" }}>

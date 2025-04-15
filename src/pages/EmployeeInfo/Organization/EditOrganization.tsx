@@ -156,25 +156,7 @@ const EditOrganization = (props: Props) => {
       cityName: location.state?.cityName || "",
       stateName: location.state?.stateName || "",
       countryName: location.state?.countryName || "",
-      // "id": location.state.id,
-      // "name": location.state.name,
-      // "cityId": location.state.cityId,
-      // "establishYear": location.state.establishYear,
-      // "address": location.state.address,
-      // "pincode": location.state.pincode,
-      // "officeNo": location.state.officeNo,
-      // "mobileNo": location.state.mobileNo,
-      // "emailId": location.state.emailId,
-      // "websiteName": location.state.websiteName,
-      // "director": location.state.director,
-      // "companyLogo": location.state.companyLogo,
-      // "gstnNo": location.state.gstnNo,
-      // "panNo": location.state.panNo,
-      // "createdBy": location.state.createdBy,
-      // "updatedBy": location.state.updatedBy,
-      // "createdOn": location.state.createdOn,
-      // "updatedOn": location.state.updatedOn,
-      // "cityName": location.state.cityName
+      
     },
 
     validationSchema: Yup.object({
@@ -351,12 +333,17 @@ const EditOrganization = (props: Props) => {
 
               {/* CompanyName  */}
               <Grid item xs={12} sm={4} lg={4}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterCompanyName")}
                   value={formik.values.name}
-                  onChangeText={(text: string) => formik.setFieldValue("name", text)}
+
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("name", event.target.value)}
+                  // onChangeText={(text: string) => formik.setFieldValue("name", text)}
                   required={true}
-                  lang={lang}
+                 
                 />
 
                 {formik.touched.name && formik.errors.name && (
@@ -368,12 +355,16 @@ const EditOrganization = (props: Props) => {
 
               {/* Address */}
               <Grid item xs={12} sm={4} lg={4}>
-                <TranslateTextField
+                <TextField
                   label={t("text.EnterAddress")}
                   value={formik.values.address}
-                  onChangeText={(text: string) => formik.setFieldValue("address", text)}
+                  size="small"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(event) => formik.setFieldValue("address", event.target.value)}
+               
                   required={true}
-                  lang={lang}
+                 
                 />
                 {formik.touched.address && formik.errors.address && (
                   <div style={{ color: "red", margin: "5px" }}>{formik.errors.address.toString()}</div>

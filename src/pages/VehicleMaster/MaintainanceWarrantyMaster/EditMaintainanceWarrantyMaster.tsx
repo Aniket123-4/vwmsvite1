@@ -120,7 +120,7 @@ const EditMaintainanceWarrantyMaster = (props: Props) => {
     const response = await api.post(`Master/GetVendorMaster`, collectData);
     const data = response.data.data;
     //console.log("Vendor data==>  ",data);
-    const arr = [];
+    const arr:any = [];
     for (let index = 0; index < data.length; index++) {
       arr.push({
         label: data[index]["name"],
@@ -499,12 +499,17 @@ const EditMaintainanceWarrantyMaster = (props: Props) => {
 
               {/* remark */}
               <Grid item xs={12} sm={4} lg={4}>
-                <TranslateTextField
+                <TextField
                   label={t("text.Remark")}
                   value={formik.values.remark}
-                  onChangeText={(text: string) => formik.setFieldValue("remark", text)}
+
+                  onChange={(event) => formik.setFieldValue("remark", event.target.value)}
+             
                   required={true}
                   lang={lang}
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth 
+                  size="small"
                 />
 
               </Grid>
